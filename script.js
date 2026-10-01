@@ -8,7 +8,6 @@ const main = document.createElement('main');
 main.classList.add('main');
 const div = document.createElement('div');
 const span = document.createElement('span');
-
 const appContainer = div.cloneNode(false);
 body.append(appContainer);
 
@@ -57,10 +56,46 @@ let isBoardLocked = false;
 
 //finished game
 let isGameFinished = false;
-// move
 
+// move
 let moves = 0;
 let matchedPairs = 0;
+
+// localStorage
+function saveResult() {
+  const getResults = localStorage.getItem('results');
+  const results = getResults ? JSON.parse(getResults) : [];
+  const currentResalts = {
+    moves: moves,
+    date: new Date(),
+  };
+  results.push(currentResalts);
+  const stringifyResult = JSON.stringify(results);
+  localStorage.setItem('results', stringifyResult);
+}
+
+function getLeaderboard() {
+  const getResults = localStorage.getItem('results');
+  const saveResults = getResults ? JSON.parse(getResults) : [];
+
+  saveResults.sort((a, b) => {
+    if (a.moves === b.moves) {
+      return new Date(a.date) - new Date(b.date);
+    }
+    return a.moves - b.moves;
+  });
+  return saveResults.slice(0, 10);
+}
+
+// function for leader board
+function formatDate(date) {
+  const getDate = new Date(date);
+
+  const day = String(getDate.getDate()).padStart(2, '0');
+  const month = String(getDate.getMonth() + 1).padStart(2, '0');
+  const year = getDate.getFullYear();
+  return `${day}.${month}.${year}`;
+}
 
 // elements for modal
 const modalOverlayContainer = document.createElement('div');
@@ -118,6 +153,28 @@ function startNewGame() {
 //listener for new game
 newGameButton.addEventListener('click', startNewGame);
 modalNewGameButton.addEventListener('click', startNewGame);
+
+// listener for leaderBoard
+leaderBoardButton.addEventListener('click', () => {
+  const results = getLeaderboard();
+  modalContent.replaceChildren();
+  const title = document.createElement('h2');
+  title.textContent = 'LeaderBoard';
+  modalContent.append(title);
+  if (results.length === 0) {
+    const span = document.createElement('span');
+    span.textContent = 'No results yet';
+    modalContent.append(span);
+  } else {
+    results.forEach((item, index) => {
+      const span = document.createElement('span');
+      span.textContent = `${index + 1}. ${item.moves} moves — ` + formatDate(item.date);
+      modalContent.append(span);
+    });
+  }
+  modalContent.append(modalCloseButton);
+  openModal();
+});
 
 //listener for modal
 modalOverlayContainer.addEventListener('click', (e) => {
@@ -191,6 +248,7 @@ async function getCards() {
           modalContent.append(modalCloseButton);
           isGameFinished = true;
           openModal();
+          saveResult();
         }
         pairsSpan.textContent = `Pairs: ${matchedPairs} / 8`;
         firstCard.classList.add('match-card');
