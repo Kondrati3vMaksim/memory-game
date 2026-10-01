@@ -48,6 +48,93 @@ main.append(gameBoard);
 
 // data
 let data = [];
+let firstCard = null;
+let secondCard = null;
+let mismatchTimer = null;
+
+// match card
+let isBoardLocked = false;
+
+//finished game
+let isGameFinished = false;
+// move
+
+let moves = 0;
+let matchedPairs = 0;
+
+// elements for modal
+const modalOverlayContainer = document.createElement('div');
+modalOverlayContainer.classList.add('modal-container');
+const modal = document.createElement('div');
+modal.classList.add('modal');
+const modalContent = document.createElement('div');
+const victoryModalTitle = document.createElement('h2');
+const modalMoveSpan = document.createElement('span');
+victoryModalTitle.textContent = 'You Win!';
+modalContent.classList.add('modal-content');
+const modalCloseButton = document.createElement('button');
+
+modalCloseButton.type = 'button';
+modalCloseButton.textContent = 'Close';
+const modalNewGameButton = document.createElement('button');
+
+modalNewGameButton.textContent = 'New Game';
+modalOverlayContainer.append(modal);
+
+modal.append(modalContent);
+body.append(modalOverlayContainer);
+
+//function for modal
+function openModal() {
+  modalOverlayContainer.classList.add('show-modal');
+  body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  modalOverlayContainer.classList.remove('show-modal');
+  body.style.overflow = '';
+}
+
+//function restart Game
+
+function startNewGame() {
+  clearTimeout(mismatchTimer);
+  firstCard = null;
+  secondCard = null;
+  mismatchTimer = null;
+
+  isBoardLocked = false;
+  isGameFinished = false;
+  moves = 0;
+  matchedPairs = 0;
+  movesSpan.textContent = `Moves: ${moves}`;
+  pairsSpan.textContent = `Pairs: ${matchedPairs} / 8`;
+  modalMoveSpan.textContent = `Moves: ${moves}`;
+  closeModal();
+  gameBoard.replaceChildren();
+  getCards();
+}
+
+//listener for new game
+newGameButton.addEventListener('click', startNewGame);
+modalNewGameButton.addEventListener('click', startNewGame);
+
+//listener for modal
+modalOverlayContainer.addEventListener('click', (e) => {
+  if (e.target !== e.currentTarget) {
+    return;
+  }
+  closeModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeModal();
+  }
+});
+
+modalCloseButton.addEventListener('click', () => {
+  closeModal();
+});
 
 async function getCards() {
   const response = await fetch('./data.json');
@@ -56,16 +143,82 @@ async function getCards() {
   data = arr;
   const cards = [...data, ...data];
   shuffleCards(cards);
+
   cards.forEach((item) => {
-    const div = document.createElement('div');
-    div.classList.add('card-container');
+    const singleCard = document.createElement('div');
+    singleCard.classList.add('card-container');
+    singleCard.classList.add('close-card');
+    singleCard.dataset.id = item.id;
+
+    singleCard.addEventListener('click', (e) => {
+      if (isBoardLocked) {
+        return;
+      }
+
+      if (isGameFinished) {
+        return;
+      }
+      if (e.currentTarget.classList.contains('match-card')) {
+        return;
+      }
+      if (firstCard === e.currentTarget) {
+        return;
+      }
+      if (firstCard !== null && secondCard !== null) {
+        return;
+      }
+      if (firstCard === null) {
+        firstCard = e.currentTarget;
+
+        firstCard.classList.remove('close-card');
+        firstCard.classList.add('open-card');
+        return;
+      }
+      secondCard = e.currentTarget;
+      moves++;
+      movesSpan.textContent = `Moves: ${moves}`;
+      secondCard.classList.remove('close-card');
+      secondCard.classList.add('open-card');
+
+      if (firstCard.dataset.id === secondCard.dataset.id) {
+        matchedPairs++;
+        if (matchedPairs === 8) {
+          modalContent.replaceChildren();
+          modalMoveSpan.textContent = `Moves: ${moves}`;
+          modalContent.append(victoryModalTitle);
+          modalContent.append(modalMoveSpan);
+          modalContent.append(modalNewGameButton);
+          modalContent.append(modalCloseButton);
+          isGameFinished = true;
+          openModal();
+        }
+        pairsSpan.textContent = `Pairs: ${matchedPairs} / 8`;
+        firstCard.classList.add('match-card');
+        secondCard.classList.add('match-card');
+        firstCard = null;
+        secondCard = null;
+      } else {
+        isBoardLocked = true;
+        mismatchTimer = setTimeout(() => {
+          firstCard.classList.remove('open-card');
+          firstCard.classList.add('close-card');
+          secondCard.classList.remove('open-card');
+          secondCard.classList.add('close-card');
+          firstCard = null;
+          secondCard = null;
+          isBoardLocked = false;
+          mismatchTimer = null;
+        }, 1000);
+      }
+    });
+
     const name = document.createElement('span');
     name.textContent = item.title;
     const id = document.createElement('span');
     id.textContent = item.id;
-    div.append(name);
-    div.append(id);
-    gameBoard.append(div);
+    singleCard.append(name);
+    singleCard.append(id);
+    gameBoard.append(singleCard);
   });
 }
 
