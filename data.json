@@ -1,34 +1,34 @@
 [
   {
     "id": "1",
-    "title": "name1"
+    "title": "./assets/rocket.svg"
   },
   {
     "id": "2",
-    "title": "name2"
+    "title": "assets/earth-americas.svg"
   },
   {
     "id": "3",
-    "title": "name3"
+    "title": "assets/moon.svg"
   },
   {
     "id": "4",
-    "title": "name4"
+    "title": "assets/satellite-dish.svg"
   },
   {
     "id": "5",
-    "title": "name5"
+    "title": "assets/satellite.svg"
   },
   {
     "id": "6",
-    "title": "name6"
+    "title": "assets/shuttle-space.svg"
   },
   {
     "id": "7",
-    "title": "name7"
+    "title": "assets/meteor.svg"
   },
   {
     "id": "8",
-    "title": "name8"
+    "title": "assets/user-astronaut.svg"
   }
 ]

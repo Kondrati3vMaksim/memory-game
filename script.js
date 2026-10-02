@@ -193,16 +193,19 @@ modalCloseButton.addEventListener('click', () => {
   closeModal();
 });
 
-async function getCards() {
+async function loadCardsData() {
   const response = await fetch('./data.json');
-
   const arr = await response.json();
   data = arr;
+}
+
+function getCards() {
   const cards = [...data, ...data];
   shuffleCards(cards);
 
   cards.forEach((item) => {
-    const singleCard = document.createElement('div');
+    const singleCard = document.createElement('button');
+    singleCard.type = 'button';
     singleCard.classList.add('card-container');
     singleCard.classList.add('close-card');
     singleCard.dataset.id = item.id;
@@ -270,12 +273,10 @@ async function getCards() {
       }
     });
 
-    const name = document.createElement('span');
-    name.textContent = item.title;
-    const id = document.createElement('span');
-    id.textContent = item.id;
-    singleCard.append(name);
-    singleCard.append(id);
+    const img = document.createElement('img');
+    img.classList.add('card-image');
+    img.src = `${item.title}`;
+    singleCard.append(img);
     gameBoard.append(singleCard);
   });
 }
@@ -287,4 +288,8 @@ function shuffleCards(cards) {
   }
 }
 
-getCards();
+async function initGame() {
+  await loadCardsData();
+  getCards();
+}
+initGame();
