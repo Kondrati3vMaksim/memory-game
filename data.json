@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1",
+    "title": "./assets/rocket.svg"
+  },
+  {
+    "id": "2",
+    "title": "assets/earth-americas.svg"
+  },
+  {
+    "id": "3",
+    "title": "assets/moon.svg"
+  },
+  {
+    "id": "4",
+    "title": "assets/satellite-dish.svg"
+  },
+  {
+    "id": "5",
+    "title": "assets/satellite.svg"
+  },
+  {
+    "id": "6",
+    "title": "assets/shuttle-space.svg"
+  },
+  {
+    "id": "7",
+    "title": "assets/meteor.svg"
+  },
+  {
+    "id": "8",
+    "title": "assets/user-astronaut.svg"
+  }
+]
